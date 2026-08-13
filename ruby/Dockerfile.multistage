@@ -1,0 +1,21 @@
+FROM ruby:3.3-slim AS build
+
+WORKDIR /app
+
+COPY Gemfile Gemfile.lock ./
+
+RUN bundle install
+
+COPY . .
+
+
+FROM ruby:3.3-slim
+
+WORKDIR /app
+
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build /app .
+
+EXPOSE 3000
+
+CMD ["rails", "server", "-b", "0.0.0.0"]

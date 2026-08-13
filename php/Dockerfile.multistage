@@ -1,0 +1,22 @@
+FROM composer:2 AS build
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader
+
+COPY . .
+
+
+FROM php:8.3-apache
+
+WORKDIR /var/www/html
+
+COPY --from=build /app .
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]
